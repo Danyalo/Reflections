@@ -1,0 +1,29 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflections", "Reflections\Reflections.csproj", "{2FF5E894-11A7-443C-B2A1-878C7E14C37E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflections.Core", "Reflections.Core\Reflections.Core.csproj", "{A5C64C96-EAA8-4E4A-B681-FD8DC40E91E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflections.Data", "Reflections.Data\Reflections.Data.csproj", "{475D2D69-D95E-44A3-8D9D-6E94D5D6759F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2FF5E894-11A7-443C-B2A1-878C7E14C37E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FF5E894-11A7-443C-B2A1-878C7E14C37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FF5E894-11A7-443C-B2A1-878C7E14C37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FF5E894-11A7-443C-B2A1-878C7E14C37E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5C64C96-EAA8-4E4A-B681-FD8DC40E91E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5C64C96-EAA8-4E4A-B681-FD8DC40E91E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5C64C96-EAA8-4E4A-B681-FD8DC40E91E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5C64C96-EAA8-4E4A-B681-FD8DC40E91E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{475D2D69-D95E-44A3-8D9D-6E94D5D6759F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{475D2D69-D95E-44A3-8D9D-6E94D5D6759F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{475D2D69-D95E-44A3-8D9D-6E94D5D6759F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{475D2D69-D95E-44A3-8D9D-6E94D5D6759F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
