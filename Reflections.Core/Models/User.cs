@@ -7,9 +7,9 @@ namespace Reflections.Core.Models
         [Key]
         public int UserId { get; set; }
         [Required]
-        public int? CitizenId { get; set; }
+        public int CitizenId { get; set; }
         [Required]
-        public int? RoleId { get; set; }
+        public int RoleId { get; set; }
         [Required]
         public string Password { get; set; }
         [Required]

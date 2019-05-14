@@ -1,0 +1,33 @@
+﻿@page
+@model RegistrationModel
+@{
+}
+
+
+<h2>Реєстрація</h2>
+
+<form method="post">
+
+    <div class="form-group">
+        <label asp-for="Citizen.IPN">ІПН</label>
+        <input asp-for="Citizen.IPN" class="form-control" />
+        <span class="text-danger" asp-validation-for="Citizen.IPN"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Citizen.Name">Ім'я</label>
+        <input asp-for="Citizen.Name" class="form-control" />
+        <span class="text-danger" asp-validation-for="Citizen.Name"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Citizen.Surname">Прізвище</label>
+        <input asp-for="Citizen.Surname" class="form-control" />
+        <span class="text-danger" asp-validation-for="Citizen.Surname"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Citizen.Patronym">По-батькові</label>
+        <input asp-for="Citizen.Patronym" class="form-control" />
+        <span class="text-danger" asp-validation-for="Citizen.Patronym"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Зареєструватись</button>
+</form>

@@ -4,24 +4,17 @@ using Reflections.Data.Promise;
 
 namespace Reflections.Data.Repository
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
-        private readonly ReflectionsContext db;
-
         public UserRepository(ReflectionsContext db)
+            : base(db)
         {
-            this.db = db;
         }
 
         public User Add(User newUser)
         {
             db.Users.Add(newUser);
             return newUser;
-        }
-
-        public int Commit()
-        {
-            return db.SaveChanges();
         }
 
         public User Delete(int id)

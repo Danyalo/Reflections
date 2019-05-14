@@ -3,12 +3,7 @@ using Reflections.Core.Models;
 
 namespace Reflections.Data.Promise
 {
-    public interface IUserRepository
+    public interface IUserRepository : IBaseRepositoryPromise<User>
     {
-        User GetById(int id);
-        User Update(User updatedUser);
-        User Add(User newUser);
-        User Delete(int id);
-        int Commit();
     }
 }

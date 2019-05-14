@@ -6,6 +6,7 @@ namespace Reflections.Data
     public class ReflectionsContext : DbContext
     {
         public DbSet<User> Users { get; set; }
+        public DbSet<Citizen> Citizens { get; set; }
 
         public ReflectionsContext()
         {
@@ -18,10 +19,10 @@ namespace Reflections.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
+            //if (!optionsBuilder.IsConfigured)
+            //{
                 optionsBuilder.UseNpgsql("User ID = postgres;Server=localhost;Database=Reflections;Integrated Security=true;Pooling=true");
-            }
+            //}
         }
     }
 }
