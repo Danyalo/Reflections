@@ -365,6 +365,34 @@ namespace Reflections
         //SET citizen_id = id
         //WHERE chief_house_officer=1;
 
+        public static void AddChiefHouseOfficer(Election election, VirtualHouse VirtualHouse, Citizen citizen)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                var ChiefHouseOfficer = new ChiefHouseOfficer
+                {
+                    ElectionId = election.ElectionId,
+                    VirtualHouseId = VirtualHouse.VirtualHouseId,
+                    CitizenId = citizen.CitizenId
+                };
+                db.ChiefHouseOfficer.Add(ChiefHouseOfficer);
+                db.SaveChanges();
+            }
+        }
+
+        public static void UpdateChiefHouseOfficer(int ChiefHouseOfficerId, Citizen citizen)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                var dbChiefHouseOfficer = db.ChiefHouseOfficer.Where(e => e.ChiefHouseOfficerId == ChiefHouseOfficerId).First();
+                if (dbChiefHouseOfficer != null)
+                {
+                    dbChiefHouseOfficer.CitizenId = citizen.CitizenId;
+                }
+                db.SaveChanges();
+            }
+        }
+
         //надати головi ЦВК остаточнi результати виборiв в окрузi (пiсля виборiв);
         //SELECT candidate_id, first_name, last_name, patronymic, trunc( 100.0 * COUNT(*)/ COUNT(*) over(), 2) as percent_votes FROM virtual_region
         //    INNER JOIN virtual_house ON virtual_region.virtual_region_id = virtual_house.virtual_region_id
@@ -374,8 +402,87 @@ namespace Reflections
         //    WHERE vote.election_id = id AND virtual_region.virtual_region_id = virtual_id
         //    GROUP BY candidate_id;
 
+        public static List<Result> GetResultsVirtualRegion(Election election, VirtualRegion virtualRegion)
+        {
+            var candidateResult = new List<Result>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+
+                var results = from region in db.VirtualRegion
+                              join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
+                              join vote in db.Vote on house.VirtualHouseId equals vote.VirtualHouseId
+                              join candidate in db.Candidate on vote.CandidateId equals candidate.CandidateId
+                              join citizen in db.Citizen on candidate.CitizenId equals citizen.CitizenId
+                              where vote.ElectionId == election.ElectionId && region.VirtualRegionId == virtualRegion.VirtualRegionId
+                              select new Result
+                              {
+                                  CandidateId = candidate.CandidateId,
+                                  FirstName = citizen.FirstName,
+                                  LastName = citizen.LastName,
+                                  Patronymic = citizen.Patronymic,
+                                  Votes = 0,
+                                  VotesPercent = 0
+                              };
+
+                var allVotes = results.Count();
+                var resultsGroupBy = results.GroupBy(e => e.CandidateId);
+
+                foreach (var group in resultsGroupBy)
+                {
+                    var candidate = group.First();
+                    candidateResult.Add(new Result
+                    {
+                        CandidateId = candidate.CandidateId,
+                        FirstName = candidate.FirstName,
+                        LastName = candidate.LastName,
+                        Patronymic = candidate.Patronymic,
+                        Votes = group.Count(),
+                        VotesPercent = group.Count() / allVotes
+                    });
+                }
+
+                return candidateResult;
+
+            }
+        }
+
         //переглянути перелiк виборцiв вiртуальних дiльниць округу (у будь - який час);
-        //---------------------//
+        public static List<Tuple<VirtualHouse, List<Citizen>>> GetVirtualHousesAndCitizens(VirtualRegion virtualRegion)
+        {
+            var virtualHouseAndCitizens = new List<Tuple<VirtualHouse, List<Citizen>>>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+
+                var results = from house in db.VirtualHouse
+                              join citizenHouse in db.CitizenVirtualHouse on house.VirtualHouseId equals citizenHouse.VirtualHouseId
+                              join citizen in db.Citizen on citizenHouse.CitizenId equals citizen.CitizenId
+                              where house.VirtualRegionId == virtualRegion.VirtualRegionId
+                              select new
+                              {
+                                  virtualHouse = house,
+                                  houseCitizen = citizen
+                              };
+
+                var resultsGroupBy = results.GroupBy(e => e.virtualHouse.VirtualHouseId);
+
+
+                foreach (var group in resultsGroupBy)
+                {
+                    virtualHouseAndCitizens.Add(Tuple.Create(group.First().virtualHouse, new List<Citizen>()));
+
+                    foreach (var element in group)
+                    {
+                        virtualHouseAndCitizens[virtualHouseAndCitizens.Count - 1].Item2.Add(element.houseCitizen);
+                    }
+
+                }
+
+                return virtualHouseAndCitizens;
+
+            }
+        }
 
         //переглянути скарги спостерiгачiв та звернення вiртуального округу (у будь-який час);
         //SELECT * FROM citizen_feedback
