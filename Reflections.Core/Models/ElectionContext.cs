@@ -193,6 +193,8 @@ namespace Reflections
 
                 entity.Property(e => e.VirtualHouseId).HasColumnName("virtual_house_id");
 
+                entity.Property(e => e.IsActive).HasColumnName("is_active");
+
                 entity.HasOne(d => d.Citizen)
                     .WithMany(p => p.CitizenVirtualHouse)
                     .HasForeignKey(d => d.CitizenId)
