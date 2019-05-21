@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Reflections.Data\Reflections.Data.csproj" />
+    <ProjectReference Include="..\Reflections.Core\Reflections.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="wwwroot\css\style.css" />
