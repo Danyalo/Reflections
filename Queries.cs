@@ -637,8 +637,6 @@ namespace Reflections
         //    VALUES(,,);
         public static void AddObserverFeedback(ObserverFeedback observerFeedback)
         {
-            var candidateResult = new List<Result>();
-
             using (ElectionContext db = new ElectionContext())
             {
                 db.ObserverFeedback.Add(observerFeedback);
@@ -651,15 +649,29 @@ namespace Reflections
         //подати звернення до голови вiртуальноЁ дiльницi (у будь - який час);
         //INSERT INTO citizen_feedback(election_id, virtual_house_id, citizen_id, text)
         //    VALUES(,,)
+        public static void AddCitizenFeedback(CitizenFeedback citizenFeedback)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                db.CitizenFeedback.Add(citizenFeedback);
+                db.SaveChanges();
+            }
+        }
         //проголосувати(пiд час виборiв, тiльки один раз);
         //IF(EXISTS(SELECT vote_id FROM vote WHERE citizen_id = c_id AND election_id = e_id), , )
         //INSERT INTO vote(election_id, virtual_house_id, citizen_id, candidate_id)
         //    VALUES(,,);
+        public static void AddVote(Vote vote)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                db.Vote.Add(vote);
+                db.SaveChanges();
+            }
+        }
         //переглянути результати голосування(пiсля виборiв та оголошення головою ЦВК);
         //SELECT * FROM RESULTS;
-
-
-
+        //---------------------//
 
 
 
