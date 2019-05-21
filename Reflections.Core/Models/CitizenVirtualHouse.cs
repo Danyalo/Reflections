@@ -9,6 +9,7 @@ namespace Reflections
         public int CitizenId { get; set; }
         public int VirtualHouseId { get; set; }
         public DateTime RegistrationTime { get; set; }
+        public bool IsActive { get; set; }
 
         public virtual Citizen Citizen { get; set; }
         public virtual VirtualHouse VirtualHouse { get; set; }
