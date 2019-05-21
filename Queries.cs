@@ -301,12 +301,61 @@ namespace Reflections
         }
 
         //переглянути перелiк виборцiв вiртуальних дiльниць та округiв(у будь - який час);
-        //---------------------//
+        public static List<Citizen> GetVirtualHouseVoters(VirtualHouse virtualHouse)
+        {
+            var virtualHouseVoters = new List<Citizen>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                virtualHouseVoters = (from house in db.CitizenVirtualHouse
+                                      join citizen in db.Citizen on house.CitizenId equals citizen.CitizenId
+                                      where house.VirtualHouseId == virtualHouse.VirtualHouseId
+                                      select citizen).ToList();
+            }
+            return virtualHouseVoters;
+        }
+
+        public static List<Citizen> GetVirtualRegionVoters(VirtualRegion virtualRegion)
+        {
+            var virtualHouseVoters = new List<Citizen>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                virtualHouseVoters = (from region in db.VirtualRegion
+                                      join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
+                                      join citizenHouse in db.CitizenVirtualHouse on house.VirtualHouseId equals citizenHouse.VirtualHouseId
+                                      join citizen in db.Citizen on citizenHouse.CitizenId equals citizen.CitizenId
+                                      where region.VirtualRegionId == virtualRegion.VirtualRegionId
+                                      select citizen).ToList();
+            }
+            return virtualHouseVoters;
+        }
 
         //переглянути усi скарги спостерiгачiв та звернення громадян(у будь - який час);
         //SELECT * FROM citizen_feedback;
         //SELECT * FROM observer_feedback;
 
+        public static List<CitizenFeedback> GetCitizenFeedback(Election election)
+        {
+            var citizenFeedback = new List<CitizenFeedback>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                citizenFeedback = db.CitizenFeedback.Where(e => e.ElectionId == election.ElectionId).ToList();
+            }
+            return citizenFeedback;
+        }
+
+        public static List<ObserverFeedback> GetObserverFeedback(Election election)
+        {
+            var observerFeedback = new List<ObserverFeedback>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                observerFeedback = db.ObserverFeedback.Where(e => e.ElectionId == election.ElectionId).ToList();
+            }
+            return observerFeedback;
+        }
         //////////////Голова окружної комісії
 
         //обрати чи змiнити голiв дiльничних комiсiй (до початку виборiв);
