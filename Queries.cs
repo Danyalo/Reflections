@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,8 @@ using System.Data;
 
 namespace Reflections
 {
+
+
     class Queries
     {
 
@@ -210,6 +212,34 @@ namespace Reflections
         //database.Add(chief_region_officer);
         //var id = 1;
         //var virtual_house = database.First(cro => cro.chief_region_officer_id == id);
+        public static void AddChiefRegionOfficer(Election election, VirtualRegion virtualRegion, Citizen citizen)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                var chiefRegionOfficer = new ChiefRegionOfficer
+                {
+                    ElectionId = election.ElectionId,
+                    VirtulRegionId = virtualRegion.VirtualRegionId,
+                    CitizenId = citizen.CitizenId
+                };
+                db.ChiefRegionOfficer.Add(chiefRegionOfficer);
+                db.SaveChanges();
+            }
+        }
+
+        public static void UpdateChiefRegionOfficer(int chiefRegionOfficerId, Citizen citizen)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                var dbChiefRegionOfficer = db.ChiefRegionOfficer.Where(e => e.ChiefRegionOfficerId == chiefRegionOfficerId).First();
+                if (dbChiefRegionOfficer != null)
+                {
+                    dbChiefRegionOfficer.CitizenId = citizen.CitizenId;
+                }
+                db.SaveChanges();
+            }
+        }
+
 
         //оголосити остаточнi результати виборiв у краЁнi (пiсля виборiв);
         //SELECT candidate_id, first_name, last_name, patronymic, trunc( 100.0 * COUNT(*)/ COUNT(*) over(), 2) as percent_votes  FROM vote
@@ -217,6 +247,58 @@ namespace Reflections
         //    INNER JOIN citizen ON candidate.citizen_id = citizen.citizen_id
         //    WHERE vote.election_id = id
         //    GROUP BY candidate_id;
+        public class Result
+        {
+            public int CandidateId { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Patronymic { get; set; }
+            public int Votes { get; set; }
+            public decimal VotesPercent { get; set; }
+        }
+
+        public static List<Result> GetResults(Election election)
+        {
+            var candidateResult = new List<Result>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                var results = from vote in db.Vote
+                              join candidate in db.Candidate on vote.CandidateId equals candidate.CandidateId
+                              join citizen in db.Citizen on candidate.CitizenId equals citizen.CitizenId
+                              where vote.ElectionId == election.ElectionId
+                              select new Result
+                              {
+                                  CandidateId = candidate.CandidateId,
+                                  FirstName = citizen.FirstName,
+                                  LastName = citizen.LastName,
+                                  Patronymic = citizen.Patronymic,
+                                  Votes = 0,
+                                  VotesPercent = 0
+                              };
+
+                var allVotes = results.Count();
+
+                var resultsGroupBy = results.GroupBy(e => e.CandidateId);
+
+                foreach (var group in resultsGroupBy)
+                {
+                    var candidate = group.First();
+                    candidateResult.Add(new Result
+                    {
+                        CandidateId = candidate.CandidateId,
+                        FirstName = candidate.FirstName,
+                        LastName = candidate.LastName,
+                        Patronymic = candidate.Patronymic,
+                        Votes = group.Count(),
+                        VotesPercent = group.Count() / allVotes
+                    });
+                }
+
+                return candidateResult;
+
+            }
+        }
 
         //переглянути перелiк виборцiв вiртуальних дiльниць та округiв(у будь - який час);
         //---------------------//
