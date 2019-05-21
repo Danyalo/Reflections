@@ -523,7 +523,7 @@ namespace Reflections
 
         //////////Голова дільничної комісії
         //виборці віртуальної дільниці
-        //---------------------//
+        //уже описаний у попередніх запитах//
 
         //долучити громадянина (без визначеноЁ дiльницi) до сво№Ё вiртуальноЁ дiльницi (до початку виборiв);
         public static void AddCitizenToVirtualHouse(Citizen citizen, VirtualHouse virtualHouse)
@@ -560,6 +560,7 @@ namespace Reflections
         //переглянути звернення громадян (у будь-який час);
         //SELECT * FROM citizen_feedback
         //WHERE virtual_house_id = id AND election_id = e_id;    
+        //уже описаний у попередніх запитах//
 
         public static List<CitizenFeedback> GetCitizenFeedback(Election election, VirtualHouse virtualHouse)
         {
@@ -626,11 +627,12 @@ namespace Reflections
 
         //////////Спостерiгач:
         //переглянути перелiк виборцiв вiртуальноЁ дiльницi(у будь - який час);
-        //---------------------//
+        //уже описаний у попередніх запитах//
 
         //переглянути звернення громадян(у будь - який час);
         //SELECT * FROM citizen_feedback
         //WHERE virtual_house_id = id AND election_id = e_id;  
+        //уже описаний у попередніх запитах//
 
         //подати скаргу (пiд час виборiв);
         //INSERT INTO observer_feedback(election_id, virtual_house_id, observer_id, text)
@@ -671,7 +673,7 @@ namespace Reflections
         }
         //переглянути результати голосування(пiсля виборiв та оголошення головою ЦВК);
         //SELECT * FROM RESULTS;
-        //---------------------//
+        //уже описаний у попередніх запитах//
 
 
 
@@ -684,6 +686,7 @@ namespace Reflections
         //    INNER JOIN citizen ON candidate.citizen_id = citizen.citizen_id
         //    WHERE vote.election_id = id
         //    GROUP BY candidate_id;
+        //уже описаний у попередніх запитах//
 
         //переглянути результати голосування у обраному окрузi O;
         //SELECT candidate_id, first_name, last_name, patronymic, trunc( 100.0 * COUNT(*)/ COUNT(*) over(), 2) as percent_votes FROM virtual_house 
@@ -692,6 +695,7 @@ namespace Reflections
         //    INNER JOIN citizen ON candidate.citizen_id = citizen.citizen_id
         //    WHERE vote.election_id = id AND virtual_region.virtual_region_id = virtual_id
         //    GROUP BY candidate_id;
+        //уже описаний у попередніх запитах//
 
         //переглянути результати голосування у обранiй дiльницi D;
         //  SELECT candidate_id, first_name, last_name, patronymic, trunc( 100.0 * COUNT(*)/ COUNT(*) over(), 2) as percent_votes FROM virtual_house
@@ -700,6 +704,7 @@ namespace Reflections
         //    INNER JOIN citizen ON candidate.citizen_id = citizen.citizen_id
         //  WHERE vote.election_id = id AND virtual_house.virtual_house_id = virtual_id
         //  GROUP BY candidate_id;
+        //уже описаний у попередніх запитах//
 
         //показати усi округи та для кожного з них: кiлькiсть виборцiв, що проголосували, переможця у окрузi та його результат;
         //  WITH region_candidate AS(
@@ -717,6 +722,17 @@ namespace Reflections
         //  SELECT region_voters.virtual_region_id, region_votes.name, candidate_id, first_name, last_name, patronymic, MAX(candidate_votes) FROM region_voters
         //    INNER JOIN region_candidate_votes ON region_voters.virtual_region_id = region_candidate_votes.virtual_region_id;
         //  GROUP BY region_voters.virtual_region_id;
+        public class VirtualRegionResult
+        {
+            public VirtualRegion VirtualRegion { get; set; }
+            public int Votes { get; set; }
+            public Citizen Winner { get; set; }
+            public decimal RegionResult { get; set; }
+        }
+        public static void GetEachVirtualRegionResults(Election election)
+        {
+
+        }
 
 
         //показати усi дiльницi обраного округу O та для кожноЁ з них: 
