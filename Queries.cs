@@ -295,7 +295,7 @@ namespace Reflections
                     });
                 }
 
-                return candidateResult;
+                return candidateResult.OrderBy(e => e.Votes).ToList();
 
             }
         }
@@ -491,6 +491,35 @@ namespace Reflections
         //SELECT * FROM observer_feedback
         //  INNER JOIN virtual_house ON observer_feedback.virtual_house_id = virtual_house.virtual_house_id
         //WHERE virtual_house.virtual_region_id = id;
+        public static List<CitizenFeedback> GetVirtualRegionCitizenFeedback(Election election, VirtualRegion virtualRegion)
+        {
+            var citizenFeedback = new List<CitizenFeedback>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                citizenFeedback = (from region in db.VirtualRegion
+                                  join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
+                                  join feedback in db.CitizenFeedback on house.VirtualHouseId equals feedback.VirtualHouseId
+                                  where region.VirtualRegionId == virtualRegion.VirtualRegionId
+                                  select feedback).ToList(); 
+            }
+            return citizenFeedback;
+        }
+
+        public static List<ObserverFeedback> GetVirtualRegionObserverFeedback(Election election, VirtualRegion virtualRegion)
+        {
+            var observerFeedback = new List<ObserverFeedback>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                observerFeedback = (from region in db.VirtualRegion
+                                   join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
+                                   join feedback in db.ObserverFeedback on house.VirtualHouseId equals feedback.VirtualHouseId
+                                   where region.VirtualRegionId == virtualRegion.VirtualRegionId
+                                   select feedback).ToList();
+            }
+            return observerFeedback;
+        }
 
         //////////Голова дільничної комісії
         //виборці віртуальної дільниці
