@@ -442,7 +442,7 @@ namespace Reflections
                     });
                 }
 
-                return candidateResult;
+                return candidateResult.OrderBy(e => e.Votes).ToList();
 
             }
         }
@@ -498,10 +498,10 @@ namespace Reflections
             using (ElectionContext db = new ElectionContext())
             {
                 citizenFeedback = (from region in db.VirtualRegion
-                                  join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
-                                  join feedback in db.CitizenFeedback on house.VirtualHouseId equals feedback.VirtualHouseId
-                                  where region.VirtualRegionId == virtualRegion.VirtualRegionId
-                                  select feedback).ToList(); 
+                                   join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
+                                   join feedback in db.CitizenFeedback on house.VirtualHouseId equals feedback.VirtualHouseId
+                                   where region.VirtualRegionId == virtualRegion.VirtualRegionId
+                                   select feedback).ToList();
             }
             return citizenFeedback;
         }
@@ -513,10 +513,10 @@ namespace Reflections
             using (ElectionContext db = new ElectionContext())
             {
                 observerFeedback = (from region in db.VirtualRegion
-                                   join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
-                                   join feedback in db.ObserverFeedback on house.VirtualHouseId equals feedback.VirtualHouseId
-                                   where region.VirtualRegionId == virtualRegion.VirtualRegionId
-                                   select feedback).ToList();
+                                    join house in db.VirtualHouse on region.VirtualRegionId equals house.VirtualRegionId
+                                    join feedback in db.ObserverFeedback on house.VirtualHouseId equals feedback.VirtualHouseId
+                                    where region.VirtualRegionId == virtualRegion.VirtualRegionId
+                                    select feedback).ToList();
             }
             return observerFeedback;
         }
@@ -526,15 +526,52 @@ namespace Reflections
         //---------------------//
 
         //долучити громадянина (без визначеноЁ дiльницi) до сво№Ё вiртуальноЁ дiльницi (до початку виборiв);
-        //---------------------//
+        public static void AddCitizenToVirtualHouse(Citizen citizen, VirtualHouse virtualHouse)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                db.CitizenVirtualHouse.Add(new CitizenVirtualHouse
+                {
+                    CitizenId = citizen.CitizenId,
+                    VirtualHouseId = virtualHouse.VirtualHouseId,
+                    RegistrationTime = DateTime.Now,
+                    IsActive = true
+                });
+                db.SaveChanges();
+            }
+
+        }
 
         //вилучити громадянина зi своєї вiртуальної дiльницi (до початку виборiв);
-        //---------------------//
+        public static void DeleteCitizenFromVirtualHouse(Citizen citizen, VirtualHouse virtualHouse)
+        {
+            using (ElectionContext db = new ElectionContext())
+            {
+                var citizenVirtualHouse = db.CitizenVirtualHouse.
+                    Where(e => e.VirtualHouseId == virtualHouse.VirtualHouseId
+                    && e.CitizenId == citizen.CitizenId).OrderByDescending(e => e.RegistrationTime).First();
+                citizenVirtualHouse.IsActive = false;
+                db.SaveChanges();
+            }
+
+        }
 
 
         //переглянути звернення громадян (у будь-який час);
         //SELECT * FROM citizen_feedback
         //WHERE virtual_house_id = id AND election_id = e_id;    
+
+        public static List<CitizenFeedback> GetCitizenFeedback(Election election, VirtualHouse virtualHouse)
+        {
+            var citizenFeedback = new List<CitizenFeedback>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                citizenFeedback = db.CitizenFeedback.Where(e => e.ElectionId == election.ElectionId
+                && e.VirtualHouseId == virtualHouse.VirtualHouseId).ToList();
+            }
+            return citizenFeedback;
+        }
 
         //надати головi окружноЁ комiсiЁ остаточнi результати виборiв у дiльницi;
         //  SELECT candidate_id, first_name, last_name, patronymic, trunc( 100.0 * COUNT(*)/ COUNT(*) over(), 2) as percent_votes FROM virtual_house
@@ -543,6 +580,49 @@ namespace Reflections
         //    INNER JOIN citizen ON candidate.citizen_id = citizen.citizen_id
         //  WHERE vote.election_id = id AND virtual_house.virtual_house_id = virtual_id
         //  GROUP BY candidate_id;
+
+        public static List<Result> GetVirtualHouseResults(Election election, VirtualHouse virtualHouse)
+        {
+            var candidateResult = new List<Result>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                var results = from vote in db.Vote
+                              join candidate in db.Candidate on vote.CandidateId equals candidate.CandidateId
+                              join citizen in db.Citizen on candidate.CitizenId equals citizen.CitizenId
+                              where vote.ElectionId == election.ElectionId && vote.VirtualHouseId == virtualHouse.VirtualHouseId
+                              select new Result
+                              {
+                                  CandidateId = candidate.CandidateId,
+                                  FirstName = citizen.FirstName,
+                                  LastName = citizen.LastName,
+                                  Patronymic = citizen.Patronymic,
+                                  Votes = 0,
+                                  VotesPercent = 0
+                              };
+
+                var allVotes = results.Count();
+
+                var resultsGroupBy = results.GroupBy(e => e.CandidateId);
+
+                foreach (var group in resultsGroupBy)
+                {
+                    var candidate = group.First();
+                    candidateResult.Add(new Result
+                    {
+                        CandidateId = candidate.CandidateId,
+                        FirstName = candidate.FirstName,
+                        LastName = candidate.LastName,
+                        Patronymic = candidate.Patronymic,
+                        Votes = group.Count(),
+                        VotesPercent = group.Count() / allVotes
+                    });
+                }
+
+                return candidateResult.OrderBy(e => e.Votes).ToList();
+            }
+        }
+
 
         //////////Спостерiгач:
         //переглянути перелiк виборцiв вiртуальноЁ дiльницi(у будь - який час);
@@ -555,6 +635,16 @@ namespace Reflections
         //подати скаргу (пiд час виборiв);
         //INSERT INTO observer_feedback(election_id, virtual_house_id, observer_id, text)
         //    VALUES(,,);
+        public static void AddObserverFeedback(ObserverFeedback observerFeedback)
+        {
+            var candidateResult = new List<Result>();
+
+            using (ElectionContext db = new ElectionContext())
+            {
+                db.ObserverFeedback.Add(observerFeedback);
+                db.SaveChanges();
+            }
+        }
 
         ////////Громадянин:
 
