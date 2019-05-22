@@ -33,7 +33,7 @@ namespace Reflections
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=Election;Username=postgres;Password=postgres");
+                optionsBuilder.UseNpgsql("Host=pg.lnu.algotester.com;Port=47474;Database=reflections;Username=dl19;Password=LErSj88U3*FLP&fP");
             }
         }
 
